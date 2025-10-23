@@ -9,4 +9,6 @@ public interface ClientEventStore {
     List<ClientEvent> loadByClientId(String clientId);
 
     ClientEvent append(ClientEvent event);
+
+    List<ClientEvent> loadAll();
 }

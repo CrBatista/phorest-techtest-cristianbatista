@@ -57,6 +57,18 @@ public class ClientAggregate {
             return Optional.empty();
         }
 
+        if (!snapshot.banned() && incomingProfile.banned()) {
+            return Optional.of(ClientEventType.CLIENT_BANNED);
+        }
+
+        if (snapshot.banned() && incomingProfile.banned()) {
+            return Optional.empty();
+        }
+
+        if (snapshot.banned() && !incomingProfile.banned()) {
+            return Optional.of(ClientEventType.CLIENT_UPDATED);
+        }
+
         return Optional.of(ClientEventType.CLIENT_UPDATED);
     }
 
