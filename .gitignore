@@ -1,0 +1,30 @@
+# Build output
+**/target/
+**/*.class
+
+# Logs and reports
+*.log
+**/logs/
+hs_err_pid*
+
+# Maven wrapper cache
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE configuration
+.idea/
+.project
+.classpath
+.settings/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
