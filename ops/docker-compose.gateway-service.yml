@@ -1,0 +1,36 @@
+version: "3.9"
+
+networks:
+  phorest-network:
+    driver: bridge
+
+volumes:
+  gateway_mongodb_data:
+
+services:
+  gateway-mongodb:
+    image: mongo:7.0.12
+    container_name: gateway-mongodb
+    restart: unless-stopped
+    ports:
+      - "27020:27017"
+    environment:
+      MONGO_INITDB_DATABASE: gateway_service
+    volumes:
+      - gateway_mongodb_data:/data/db
+    networks:
+      - phorest-network
+
+  gateway-service:
+    build:
+      context: ..
+      dockerfile: gateway-service/Dockerfile
+    image: phorest/gateway-service:latest
+    depends_on:
+      - gateway-mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://gateway-mongodb:27017/gateway_service
+    ports:
+      - "8080:8080"
+    networks:
+      - phorest-network
