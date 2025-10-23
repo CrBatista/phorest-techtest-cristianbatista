@@ -2,6 +2,7 @@ package com.phorest.client.application.service;
 
 import com.phorest.client.application.dto.ClientResponse;
 import com.phorest.client.application.dto.ClientUpdateRequest;
+import com.phorest.client.application.events.ClientEventPublisher;
 import com.phorest.client.domain.event.ClientEvent;
 import com.phorest.client.domain.event.ClientEventType;
 import com.phorest.client.domain.model.ClientProfile;
@@ -29,13 +30,16 @@ class ClientCommandServiceTest {
     @Mock
     private ClientEventStore eventStore;
 
+    @Mock
+    private ClientEventPublisher eventPublisher;
+
     private final Clock clock = Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneOffset.UTC);
 
     private ClientCommandService service;
 
     @BeforeEach
     void setUp() {
-        service = new ClientCommandService(eventStore, clock);
+        service = new ClientCommandService(eventStore, clock, eventPublisher);
     }
 
     @Test
@@ -46,6 +50,7 @@ class ClientCommandServiceTest {
 
         assertThat(response).isEmpty();
         verify(eventStore, never()).append(any());
+        verify(eventPublisher, never()).publish(any());
     }
 
     @Test
@@ -63,6 +68,7 @@ class ClientCommandServiceTest {
         ArgumentCaptor<ClientEvent> eventCaptor = ArgumentCaptor.forClass(ClientEvent.class);
         verify(eventStore).append(eventCaptor.capture());
         assertThat(eventCaptor.getValue().type()).isEqualTo(ClientEventType.CLIENT_UPDATED);
+        verify(eventPublisher).publish(eventCaptor.getValue());
     }
 
     @Test
@@ -79,6 +85,7 @@ class ClientCommandServiceTest {
         verify(eventStore).append(eventCaptor.capture());
         assertThat(eventCaptor.getValue().type()).isEqualTo(ClientEventType.CLIENT_BANNED);
         assertThat(eventCaptor.getValue().payload().banned()).isTrue();
+        verify(eventPublisher).publish(eventCaptor.getValue());
     }
 
     private ClientUpdateRequest request(String firstName, String lastName, String email) {

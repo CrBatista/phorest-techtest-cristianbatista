@@ -2,6 +2,7 @@ package com.phorest.client.application.service;
 
 import com.phorest.client.application.dto.ClientResponse;
 import com.phorest.client.application.dto.ClientUpdateRequest;
+import com.phorest.client.application.events.ClientEventPublisher;
 import com.phorest.client.domain.aggregate.ClientAggregate;
 import com.phorest.client.domain.event.ClientEvent;
 import com.phorest.client.domain.event.ClientEventType;
@@ -21,10 +22,12 @@ public class ClientCommandService {
 
     private final ClientEventStore eventStore;
     private final Clock clock;
+    private final ClientEventPublisher eventPublisher;
 
-    public ClientCommandService(ClientEventStore eventStore, Clock clock) {
+    public ClientCommandService(ClientEventStore eventStore, Clock clock, ClientEventPublisher eventPublisher) {
         this.eventStore = eventStore;
         this.clock = clock;
+        this.eventPublisher = eventPublisher;
     }
 
     public Optional<ClientResponse> updateClient(String clientId, ClientUpdateRequest request) {
@@ -60,6 +63,7 @@ public class ClientCommandService {
 
         ClientEvent event = buildEvent(clientId, profile, nextType.get(), aggregate.nextVersion());
         eventStore.append(event);
+        eventPublisher.publish(event);
 
         ClientSnapshot updatedSnapshot = new ClientSnapshot(
                 profile.clientId(),
@@ -104,6 +108,7 @@ public class ClientCommandService {
 
         ClientEvent event = buildEvent(snapshot.clientId(), bannedProfile, nextType.get(), aggregate.nextVersion());
         eventStore.append(event);
+        eventPublisher.publish(event);
         return true;
     }
 

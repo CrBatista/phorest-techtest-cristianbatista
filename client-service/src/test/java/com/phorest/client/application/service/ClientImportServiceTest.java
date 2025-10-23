@@ -1,6 +1,7 @@
 package com.phorest.client.application.service;
 
 import com.phorest.client.application.dto.ClientImportSummary;
+import com.phorest.client.application.events.ClientEventPublisher;
 import com.phorest.client.application.parser.ClientCsvParser;
 import com.phorest.client.domain.event.ClientEvent;
 import com.phorest.client.domain.event.ClientEventType;
@@ -34,13 +35,16 @@ class ClientImportServiceTest {
     @Mock
     private ClientEventStore eventStore;
 
+    @Mock
+    private ClientEventPublisher eventPublisher;
+
     private final Clock fixedClock = Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneOffset.UTC);
 
     private ClientImportService service;
 
     @BeforeEach
     void setUp() {
-        service = new ClientImportService(csvParser, eventStore, fixedClock);
+        service = new ClientImportService(csvParser, eventStore, fixedClock, eventPublisher);
     }
 
     @Test
@@ -58,6 +62,7 @@ class ClientImportServiceTest {
         verify(eventStore).append(captor.capture());
         assertThat(captor.getValue().type()).isEqualTo(ClientEventType.CLIENT_REGISTERED);
         assertThat(captor.getValue().occurredAt()).isEqualTo(Instant.now(fixedClock));
+        verify(eventPublisher).publish(captor.getValue());
     }
 
     @Test
@@ -75,6 +80,7 @@ class ClientImportServiceTest {
 
         assertThat(summary).isEqualTo(new ClientImportSummary(1, 0, 1, 0));
         verify(eventStore, times(1)).append(any());
+        verify(eventPublisher).publish(any());
     }
 
     @Test
@@ -89,6 +95,7 @@ class ClientImportServiceTest {
 
         assertThat(summary).isEqualTo(new ClientImportSummary(1, 0, 0, 1));
         verify(eventStore, never()).append(any());
+        verify(eventPublisher, never()).publish(any());
     }
 
     @Test
@@ -108,6 +115,7 @@ class ClientImportServiceTest {
         ArgumentCaptor<ClientEvent> eventCaptor = ArgumentCaptor.forClass(ClientEvent.class);
         verify(eventStore).append(eventCaptor.capture());
         assertThat(eventCaptor.getValue().type()).isEqualTo(ClientEventType.CLIENT_BANNED);
+        verify(eventPublisher).publish(eventCaptor.getValue());
     }
 
     private ClientProfile profile(String id, String firstName, String lastName) {

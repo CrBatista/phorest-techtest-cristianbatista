@@ -1,6 +1,7 @@
 package com.phorest.client.application.service;
 
 import com.phorest.client.application.dto.ClientImportSummary;
+import com.phorest.client.application.events.ClientEventPublisher;
 import com.phorest.client.application.parser.ClientCsvParser;
 import com.phorest.client.domain.aggregate.ClientAggregate;
 import com.phorest.client.domain.event.ClientEvent;
@@ -22,11 +23,16 @@ public class ClientImportService {
     private final ClientCsvParser csvParser;
     private final ClientEventStore eventStore;
     private final Clock clock;
+    private final ClientEventPublisher eventPublisher;
 
-    public ClientImportService(ClientCsvParser csvParser, ClientEventStore eventStore, Clock clock) {
+    public ClientImportService(ClientCsvParser csvParser,
+                               ClientEventStore eventStore,
+                               Clock clock,
+                               ClientEventPublisher eventPublisher) {
         this.csvParser = csvParser;
         this.eventStore = eventStore;
         this.clock = clock;
+        this.eventPublisher = eventPublisher;
     }
 
     public ClientImportSummary importClients(MultipartFile file) {
@@ -47,6 +53,7 @@ public class ClientImportService {
 
             ClientEvent event = buildEvent(profile, nextEventType.get(), aggregate.nextVersion());
             eventStore.append(event);
+            eventPublisher.publish(event);
 
             if (nextEventType.get() == ClientEventType.CLIENT_REGISTERED) {
                 created++;

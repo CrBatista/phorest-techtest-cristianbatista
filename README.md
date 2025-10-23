@@ -1,7 +1,7 @@
 # Minimal Spring Boot Monorepo
 
 This repository contains a four-module Spring Boot skeleton (client, booking, loyalty, gateway). Each module only exposes an `Application` entry point plus a smoke test that ensures the Spring application context loads.  
-The `client-service` now includes an event-sourced CSV ingestion endpoint for client data.
+The `client-service` now includes an event-sourced CSV ingestion endpoint for client data and publishes client lifecycle events to Kafka so other services can stay in sync without direct HTTP calls.
 
 ## Building and Testing
 
@@ -30,7 +30,7 @@ The client-service now exposes REST endpoints backed by the event store:
 
 ## Docker Compose Stack
 
-Each microservice can be containerised alongside its own MongoDB instance. To build the jars and boot the full stack:
+Each microservice can be containerised alongside its own MongoDB instance and a shared Kafka broker. To build the jars and boot the full stack:
 
 ```bash
 mvn clean package -DskipTests
@@ -49,6 +49,12 @@ You can also launch individual services with their dedicated files, for example:
 ```bash
 docker compose -f ops/docker-compose.client-service.yml up -d
 ```
+
+### Kafka Event Streaming
+
+- The `client-service` writes every `CLIENT_REGISTERED`, `CLIENT_UPDATED`, or `CLIENT_BANNED` event to the `client-events` Kafka topic after persisting it in MongoDB.
+- `booking-service` and `loyalty-service` consume that topic (each with its own consumer group) and persist the events to their local `client_events` collections. This gives every service its own event store and keeps them decoupled from synchronous calls.
+- To disable Kafka during tests, the profile-specific configuration sets `client.kafka.enabled=false`, which activates a no-op publisher/consumer implementation.
 ### Client CSV Import
 
 The client-service exposes `POST /api/v1/import/clients` which accepts a `multipart/form-data` upload containing a `clients.csv` file.  

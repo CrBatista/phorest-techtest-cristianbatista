@@ -3,10 +3,20 @@ spring:
     name: client-service
   data:
     mongodb:
-      uri: mongodb://localhost:27017/client_service
+      database: client_service
       auto-index-creation: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      spring.json.add.type.headers: false
 
 client:
+  kafka:
+    topic: client-events
+    enabled: true
   csv:
     expected-headers:
       - id
