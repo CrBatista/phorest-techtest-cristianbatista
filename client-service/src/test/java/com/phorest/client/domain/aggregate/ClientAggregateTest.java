@@ -47,6 +47,18 @@ class ClientAggregateTest {
         assertThat(nextType).contains(ClientEventType.CLIENT_UPDATED);
     }
 
+    @Test
+    void setsClientBannedWhenProfileMarkedBanned() {
+        ClientProfile existing = profile("client-1", "Jane", "Doe", "jane@example.com");
+        ClientEvent existingEvent = event("evt-1", existing, ClientEventType.CLIENT_REGISTERED, 1);
+        ClientAggregate aggregate = ClientAggregate.fromEvents(List.of(existingEvent));
+
+        ClientProfile banned = new ClientProfile("client-1", "Jane", "Doe", "jane@example.com", "123", "Female", true);
+        Optional<ClientEventType> nextType = aggregate.nextEventType(banned);
+
+        assertThat(nextType).contains(ClientEventType.CLIENT_BANNED);
+    }
+
     private ClientProfile profile(String id, String firstName, String lastName, String email) {
         return new ClientProfile(id, firstName, lastName, email, "123", "Female", false);
     }

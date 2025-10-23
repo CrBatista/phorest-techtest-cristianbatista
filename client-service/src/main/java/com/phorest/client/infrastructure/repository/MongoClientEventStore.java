@@ -7,10 +7,10 @@ import com.phorest.client.domain.repository.ClientEventStore;
 import com.phorest.client.infrastructure.repository.document.ClientEventDocument;
 import com.phorest.client.infrastructure.repository.document.ClientPayloadDocument;
 import com.phorest.client.infrastructure.repository.spring.MongoClientEventRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
 @Component
 public class MongoClientEventStore implements ClientEventStore {
 
@@ -33,6 +33,14 @@ public class MongoClientEventStore implements ClientEventStore {
         ClientEventDocument document = toDocument(event);
         ClientEventDocument saved = repository.save(document);
         return toDomain(saved);
+    }
+
+    @Override
+    public List<ClientEvent> loadAll() {
+        return repository.findAll(Sort.by(Sort.Order.asc("clientId"), Sort.Order.asc("version")))
+                .stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     private ClientEvent toDomain(ClientEventDocument document) {

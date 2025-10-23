@@ -9,6 +9,7 @@ import com.phorest.client.infrastructure.repository.spring.MongoClientEventRepos
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Sort;
 
 import java.time.Instant;
 import java.util.List;
@@ -59,6 +60,25 @@ class MongoClientEventStoreTest {
         assertThat(document.getEventId()).isEqualTo("evt-1");
         assertThat(document.getPayload().firstName()).isEqualTo("Jane");
         assertThat(saved.type()).isEqualTo(ClientEventType.CLIENT_REGISTERED);
+    }
+
+    @Test
+    void loadAllReturnsEventsOrderedByClientAndVersion() {
+        ClientEventDocument a1 = document("evt-1", "client-a", "CLIENT_REGISTERED", 1, Instant.parse("2024-01-01T00:00:00Z"));
+        ClientEventDocument a2 = document("evt-2", "client-a", "CLIENT_UPDATED", 2, Instant.parse("2024-01-02T00:00:00Z"));
+        ClientEventDocument b1 = document("evt-3", "client-b", "CLIENT_REGISTERED", 1, Instant.parse("2024-01-03T00:00:00Z"));
+        when(repository.findAll(any(Sort.class))).thenReturn(List.of(a1, a2, b1));
+
+        List<ClientEvent> events = store.loadAll();
+
+        assertThat(events)
+                .extracting(ClientEvent::clientId, ClientEvent::version)
+                .containsExactly(
+                        tuple("client-a", 1),
+                        tuple("client-a", 2),
+                        tuple("client-b", 1)
+                );
+        verify(repository).findAll(any(Sort.class));
     }
 
     private ClientEventDocument document(String eventId, String clientId, String type, int version, Instant happenedAt) {

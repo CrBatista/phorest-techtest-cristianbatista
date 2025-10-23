@@ -91,6 +91,25 @@ class ClientImportServiceTest {
         verify(eventStore, never()).append(any());
     }
 
+    @Test
+    void createsBanEventWhenClientMarkedBanned() {
+        ClientProfile existing = profile("client-1", "Jane", "Doe");
+        ClientProfile banned = new ClientProfile("client-1", "Jane", "Doe", "jane@example.com", "123", "Female", true);
+
+        when(csvParser.parse(any())).thenReturn(List.of(banned));
+        when(eventStore.loadByClientId("client-1")).thenReturn(List.of(
+                event(existing, ClientEventType.CLIENT_REGISTERED, 1)
+        ));
+        when(eventStore.append(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ClientImportSummary summary = service.importClients(mockCsv());
+
+        assertThat(summary).isEqualTo(new ClientImportSummary(1, 0, 1, 0));
+        ArgumentCaptor<ClientEvent> eventCaptor = ArgumentCaptor.forClass(ClientEvent.class);
+        verify(eventStore).append(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().type()).isEqualTo(ClientEventType.CLIENT_BANNED);
+    }
+
     private ClientProfile profile(String id, String firstName, String lastName) {
         return new ClientProfile(id, firstName, lastName, "jane@example.com", "123", "Female", false);
     }

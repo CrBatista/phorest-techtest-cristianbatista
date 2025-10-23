@@ -19,6 +19,15 @@ mvn -pl client-service spring-boot:run
 
 Replace `client-service` with the desired module (`booking-service`, `loyalty-service`, or `gateway-service`).
 
+### Client Service REST API
+
+The client-service now exposes REST endpoints backed by the event store:
+
+- `GET /api/v1/clients` – paginated list of non-banned clients (`page`, `size` query params).
+- `GET /api/v1/clients/{id}` – fetch a single non-banned client by id.
+- `PUT /api/v1/clients/{id}` – update client details (emits a `CLIENT_UPDATED` event when data changes).
+- `DELETE /api/v1/clients/{id}` – bans the client by appending a `CLIENT_BANNED` event.
+
 ## Docker Compose Stack
 
 Each microservice can be containerised alongside its own MongoDB instance. To build the jars and boot the full stack:
