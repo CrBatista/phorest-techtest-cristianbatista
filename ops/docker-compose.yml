@@ -8,7 +8,6 @@ volumes:
   client_mongodb_data:
   booking_mongodb_data:
   loyalty_mongodb_data:
-  gateway_mongodb_data:
 
 services:
   client-mongodb:
@@ -47,19 +46,6 @@ services:
       MONGO_INITDB_DATABASE: loyalty_service
     volumes:
       - loyalty_mongodb_data:/data/db
-    networks:
-      - phorest-network
-
-  gateway-mongodb:
-    image: mongo:7.0.12
-    container_name: gateway-mongodb
-    restart: unless-stopped
-    ports:
-      - "27020:27017"
-    environment:
-      MONGO_INITDB_DATABASE: gateway_service
-    volumes:
-      - gateway_mongodb_data:/data/db
     networks:
       - phorest-network
 
@@ -114,9 +100,6 @@ services:
       - client-service
       - booking-service
       - loyalty-service
-      - gateway-mongodb
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb://gateway-mongodb:27017/gateway_service
     ports:
       - "8080:8080"
     networks:
