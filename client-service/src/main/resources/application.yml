@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: client-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/client_service
+      auto-index-creation: true
+
+client:
+  csv:
+    expected-headers:
+      - id
+      - first_name
+      - last_name
+      - email
+      - phone
+      - gender
+      - banned
