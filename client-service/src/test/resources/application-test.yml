@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      database: client_service_test
+  mongodb:
+    embedded:
+      version: 5.0.5
