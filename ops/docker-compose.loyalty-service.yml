@@ -31,6 +31,6 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://loyalty-mongodb:27017/loyalty_service
     ports:
-      - "8083:8083"
+      - "8083:8080"
     networks:
       - phorest-network

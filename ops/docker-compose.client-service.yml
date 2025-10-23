@@ -31,6 +31,6 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://client-mongodb:27017/client_service
     ports:
-      - "8081:8081"
+      - "8081:8080"
     networks:
       - phorest-network

@@ -31,6 +31,6 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://booking-mongodb:27017/booking_service
     ports:
-      - "8082:8082"
+      - "8082:8080"
     networks:
       - phorest-network
