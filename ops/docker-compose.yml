@@ -1,0 +1,123 @@
+version: "3.9"
+
+networks:
+  phorest-network:
+    driver: bridge
+
+volumes:
+  client_mongodb_data:
+  booking_mongodb_data:
+  loyalty_mongodb_data:
+  gateway_mongodb_data:
+
+services:
+  client-mongodb:
+    image: mongo:7.0.12
+    container_name: client-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: client_service
+    volumes:
+      - client_mongodb_data:/data/db
+    networks:
+      - phorest-network
+
+  booking-mongodb:
+    image: mongo:7.0.12
+    container_name: booking-mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_DATABASE: booking_service
+    volumes:
+      - booking_mongodb_data:/data/db
+    networks:
+      - phorest-network
+
+  loyalty-mongodb:
+    image: mongo:7.0.12
+    container_name: loyalty-mongodb
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_DATABASE: loyalty_service
+    volumes:
+      - loyalty_mongodb_data:/data/db
+    networks:
+      - phorest-network
+
+  gateway-mongodb:
+    image: mongo:7.0.12
+    container_name: gateway-mongodb
+    restart: unless-stopped
+    ports:
+      - "27020:27017"
+    environment:
+      MONGO_INITDB_DATABASE: gateway_service
+    volumes:
+      - gateway_mongodb_data:/data/db
+    networks:
+      - phorest-network
+
+  client-service:
+    build:
+      context: ..
+      dockerfile: client-service/Dockerfile
+    image: phorest/client-service:latest
+    depends_on:
+      - client-mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://client-mongodb:27017/client_service
+    ports:
+      - "8081:8080"
+    networks:
+      - phorest-network
+
+  booking-service:
+    build:
+      context: ..
+      dockerfile: booking-service/Dockerfile
+    image: phorest/booking-service:latest
+    depends_on:
+      - booking-mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://booking-mongodb:27017/booking_service
+    ports:
+      - "8082:8080"
+    networks:
+      - phorest-network
+
+  loyalty-service:
+    build:
+      context: ..
+      dockerfile: loyalty-service/Dockerfile
+    image: phorest/loyalty-service:latest
+    depends_on:
+      - loyalty-mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://loyalty-mongodb:27017/loyalty_service
+    ports:
+      - "8083:8080"
+    networks:
+      - phorest-network
+
+  gateway-service:
+    build:
+      context: ..
+      dockerfile: gateway-service/Dockerfile
+    image: phorest/gateway-service:latest
+    depends_on:
+      - client-service
+      - booking-service
+      - loyalty-service
+      - gateway-mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://gateway-mongodb:27017/gateway_service
+    ports:
+      - "8080:8080"
+    networks:
+      - phorest-network

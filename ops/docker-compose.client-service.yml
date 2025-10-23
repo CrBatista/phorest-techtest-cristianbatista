@@ -1,0 +1,36 @@
+version: "3.9"
+
+networks:
+  phorest-network:
+    driver: bridge
+
+volumes:
+  client_mongodb_data:
+
+services:
+  client-mongodb:
+    image: mongo:7.0.12
+    container_name: client-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: client_service
+    volumes:
+      - client_mongodb_data:/data/db
+    networks:
+      - phorest-network
+
+  client-service:
+    build:
+      context: ..
+      dockerfile: client-service/Dockerfile
+    image: phorest/client-service:latest
+    depends_on:
+      - client-mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://client-mongodb:27017/client_service
+    ports:
+      - "8081:8080"
+    networks:
+      - phorest-network

@@ -1,0 +1,36 @@
+version: "3.9"
+
+networks:
+  phorest-network:
+    driver: bridge
+
+volumes:
+  booking_mongodb_data:
+
+services:
+  booking-mongodb:
+    image: mongo:7.0.12
+    container_name: booking-mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_DATABASE: booking_service
+    volumes:
+      - booking_mongodb_data:/data/db
+    networks:
+      - phorest-network
+
+  booking-service:
+    build:
+      context: ..
+      dockerfile: booking-service/Dockerfile
+    image: phorest/booking-service:latest
+    depends_on:
+      - booking-mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://booking-mongodb:27017/booking_service
+    ports:
+      - "8082:8080"
+    networks:
+      - phorest-network

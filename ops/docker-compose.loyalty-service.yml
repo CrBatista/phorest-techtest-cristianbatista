@@ -1,0 +1,36 @@
+version: "3.9"
+
+networks:
+  phorest-network:
+    driver: bridge
+
+volumes:
+  loyalty_mongodb_data:
+
+services:
+  loyalty-mongodb:
+    image: mongo:7.0.12
+    container_name: loyalty-mongodb
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_DATABASE: loyalty_service
+    volumes:
+      - loyalty_mongodb_data:/data/db
+    networks:
+      - phorest-network
+
+  loyalty-service:
+    build:
+      context: ..
+      dockerfile: loyalty-service/Dockerfile
+    image: phorest/loyalty-service:latest
+    depends_on:
+      - loyalty-mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://loyalty-mongodb:27017/loyalty_service
+    ports:
+      - "8083:8080"
+    networks:
+      - phorest-network
