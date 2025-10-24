@@ -12,6 +12,15 @@ client:
   kafka:
     enabled: false
 
+security:
+  enabled: false
+  user:
+    username: cristian
+    password: phorest2025
+  jwt:
+    secret: test-secret-should-be-32-bytes-long!!!!
+    expiration: 3600
+
 de:
   flapdoodle:
     mongodb:

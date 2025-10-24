@@ -4,6 +4,10 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: client-service-auth
+          uri: http://client-service:8080
+          predicates:
+            - Path=/api/v1/auth/token
         - id: client-service-clients
           uri: http://client-service:8080
           predicates:
@@ -45,3 +49,9 @@ spring:
 
 server:
   port: 8080
+
+security:
+  enabled: true
+  jwt:
+    secret: phorest2025-super-secret-key-change-me-please
+    expiration: 3600

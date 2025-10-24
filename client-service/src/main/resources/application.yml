@@ -26,3 +26,12 @@ client:
       - phone
       - gender
       - banned
+
+security:
+  enabled: true
+  jwt:
+    secret: phorest2025-super-secret-key-change-me-please
+    expiration: 3600
+  user:
+    username: cristian
+    password: phorest2025
