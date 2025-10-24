@@ -13,11 +13,17 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: com.phorest.loyalty.messaging
-        spring.json.value.default.type: com.phorest.loyalty.messaging.ClientEventMessage
     properties:
       spring.json.add.type.headers: false
 
 client:
   kafka:
     topic: client-events
+    enabled: true
+
+booking:
+  kafka:
+    topic:
+      services: booking-services
+      purchases: booking-purchases
     enabled: true

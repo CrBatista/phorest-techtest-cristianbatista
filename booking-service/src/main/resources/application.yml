@@ -17,6 +17,31 @@ spring:
     properties:
       spring.json.add.type.headers: false
 
+booking:
+  kafka:
+    topic:
+      services: booking-services
+      purchases: booking-purchases
+    enabled: true
+  csv:
+    appointments-headers:
+      - id
+      - client_id
+      - start_time
+      - end_time
+    services-headers:
+      - id
+      - appointment_id
+      - name
+      - price
+      - loyalty_points
+    purchases-headers:
+      - id
+      - appointment_id
+      - name
+      - price
+      - loyalty_points
+
 client:
   kafka:
     topic: client-events

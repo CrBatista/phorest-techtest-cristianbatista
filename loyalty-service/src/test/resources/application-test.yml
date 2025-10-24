@@ -11,3 +11,7 @@ spring:
 client:
   kafka:
     enabled: false
+
+booking:
+  kafka:
+    enabled: false
