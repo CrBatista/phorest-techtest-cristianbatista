@@ -1,7 +1,8 @@
 # Minimal Spring Boot Monorepo
 
 This repository contains a four-module Spring Boot skeleton (client, booking, loyalty, gateway). Each module only exposes an `Application` entry point plus a smoke test that ensures the Spring application context loads.  
-The `client-service` now includes an event-sourced CSV ingestion endpoint for client data and publishes client lifecycle events to Kafka so other services can stay in sync without direct HTTP calls.
+- The `client-service` includes an event-sourced CSV ingestion endpoint and publishes client lifecycle events to Kafka so other services stay in sync without direct HTTP calls.
+- The `gateway-service` exposes friendly paths (`/clients/**`, `/appointments/**`, `/services/**`, `/purchases/**`, `/loyalty/**`, `/import/**`) and forwards requests to the appropriate downstream microservice.
 
 ## Building and Testing
 
