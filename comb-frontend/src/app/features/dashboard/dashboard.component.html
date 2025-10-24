@@ -143,8 +143,6 @@
               <ng-container [ngSwitch]="status.status">
                 <span *ngSwitchCase="'idle'">Waiting for upload</span>
                 <span *ngSwitchCase="'uploading'">Uploading…</span>
-                <span *ngSwitchCase="'success'">{{ status.message }}</span>
-                <span *ngSwitchCase="'error'">{{ status.message }}</span>
               </ng-container>
             </p>
           </div>

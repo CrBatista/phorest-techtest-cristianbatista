@@ -24,7 +24,7 @@ public class ServiceReadService {
         this.eventStore = eventStore;
     }
 
-    public Page<ServiceResponse> getServices(Pageable pageable) {
+    public Page<ServiceResponse> getServices(Pageable pageable, String clientId) {
         List<ServiceEvent> events = eventStore.loadAll();
         Map<String, List<ServiceEvent>> byId = new LinkedHashMap<>();
         for (ServiceEvent event : events) {
@@ -35,6 +35,7 @@ public class ServiceReadService {
                 .map(ServiceAggregate::snapshot)
                 .flatMap(Optional::stream)
                 .filter(snapshot -> !snapshot.deleted())
+                .filter(snapshot -> clientId == null || clientId.isBlank() || snapshot.clientId().equals(clientId))
                 .map(this::toResponse)
                 .toList();
         int total = responses.size();

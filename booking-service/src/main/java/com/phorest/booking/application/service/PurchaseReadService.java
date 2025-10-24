@@ -24,7 +24,7 @@ public class PurchaseReadService {
         this.eventStore = eventStore;
     }
 
-    public Page<PurchaseResponse> getPurchases(Pageable pageable) {
+    public Page<PurchaseResponse> getPurchases(Pageable pageable, String clientId) {
         List<PurchaseEvent> events = eventStore.loadAll();
         Map<String, List<PurchaseEvent>> byId = new LinkedHashMap<>();
         for (PurchaseEvent event : events) {
@@ -35,6 +35,7 @@ public class PurchaseReadService {
                 .map(PurchaseAggregate::snapshot)
                 .flatMap(Optional::stream)
                 .filter(snapshot -> !snapshot.deleted())
+                .filter(snapshot -> clientId == null || clientId.isBlank() || snapshot.clientId().equals(clientId))
                 .map(this::toResponse)
                 .toList();
         int total = responses.size();

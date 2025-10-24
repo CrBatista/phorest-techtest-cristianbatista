@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,13 +45,23 @@ class AppointmentControllerTest {
 
     @Test
     void listsAppointments() throws Exception {
-        when(readService.getAppointments(any())).thenReturn(new PageImpl<>(List.of(
+        when(readService.getAppointments(any(), any())).thenReturn(new PageImpl<>(List.of(
                 new AppointmentResponse("app-1", "client-1", Instant.parse("2024-01-01T10:00:00Z"), Instant.parse("2024-01-01T11:00:00Z"))
         ), PageRequest.of(0, 20), 1));
 
         mockMvc.perform(get("/api/v1/appointments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value("app-1"));
+    }
+
+    @Test
+    void listsAppointmentsFilteredByClient() throws Exception {
+        when(readService.getAppointments(any(), any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/v1/appointments").param("clientId", "client-1"))
+                .andExpect(status().isOk());
+
+        verify(readService).getAppointments(any(), eq("client-1"));
     }
 
     @Test

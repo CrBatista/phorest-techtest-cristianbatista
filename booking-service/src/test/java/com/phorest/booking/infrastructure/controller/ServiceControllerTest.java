@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,13 +46,23 @@ class ServiceControllerTest {
 
     @Test
     void listsServices() throws Exception {
-        when(readService.getServices(any())).thenReturn(new PageImpl<>(List.of(
+        when(readService.getServices(any(), any())).thenReturn(new PageImpl<>(List.of(
                 new ServiceResponse("service-1", "appointment-1", "client-1", "Colour", BigDecimal.TEN, 10, Instant.parse("2024-01-01T10:00:00Z"))
         ), PageRequest.of(0, 20), 1));
 
         mockMvc.perform(get("/api/v1/services"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value("service-1"));
+    }
+
+    @Test
+    void listsServicesFilteredByClient() throws Exception {
+        when(readService.getServices(any(), any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/v1/services").param("clientId", "client-1"))
+                .andExpect(status().isOk());
+
+        verify(readService).getServices(any(), eq("client-1"));
     }
 
     @Test

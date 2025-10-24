@@ -25,12 +25,12 @@ describe('BookingDataService', () => {
     let results: any[] = [];
     service.getAppointmentsByClient('client-1').subscribe(value => (results = value));
 
-    const req = httpMock.expectOne(`${environment.apiBaseUrl}/appointments?page=0&size=100`);
+    const req = httpMock.expectOne(r => r.url === `${environment.apiBaseUrl}/appointments`);
     expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('clientId')).toBe('client-1');
     req.flush({
       content: [
-        { appointmentId: 'a1', clientId: 'client-1', startTime: '2024-01-01T10:00:00Z', endTime: '2024-01-01T11:00:00Z' },
-        { appointmentId: 'a2', clientId: 'client-2', startTime: '2024-01-01T10:00:00Z', endTime: '2024-01-01T11:00:00Z' }
+        { appointmentId: 'a1', clientId: 'client-1', startTime: '2024-01-01T10:00:00Z', endTime: '2024-01-01T11:00:00Z' }
       ]
     });
 
@@ -42,12 +42,13 @@ describe('BookingDataService', () => {
     let results: any[] = [];
     service.getServicesByClient('client-1', 50).subscribe(value => (results = value));
 
-    const req = httpMock.expectOne(`${environment.apiBaseUrl}/services?page=0&size=50`);
+    const req = httpMock.expectOne(r => r.url === `${environment.apiBaseUrl}/services`);
     expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('clientId')).toBe('client-1');
+    expect(req.request.params.get('size')).toBe('50');
     req.flush({
       content: [
-        { id: 's1', appointmentId: 'a1', clientId: 'client-1', name: 'Color', price: 100, loyaltyPoints: 10, performedAt: '2024-01-01T10:00:00Z' },
-        { id: 's2', appointmentId: 'a1', clientId: 'client-2', name: 'Cut', price: 50, loyaltyPoints: 5, performedAt: '2024-01-01T10:00:00Z' }
+        { id: 's1', appointmentId: 'a1', clientId: 'client-1', name: 'Color', price: 100, loyaltyPoints: 10, performedAt: '2024-01-01T10:00:00Z' }
       ]
     });
 
@@ -59,12 +60,12 @@ describe('BookingDataService', () => {
     let results: any[] = [];
     service.getPurchasesByClient('client-1').subscribe(value => (results = value));
 
-    const req = httpMock.expectOne(`${environment.apiBaseUrl}/purchases?page=0&size=100`);
+    const req = httpMock.expectOne(r => r.url === `${environment.apiBaseUrl}/purchases`);
     expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('clientId')).toBe('client-1');
     req.flush({
       content: [
-        { id: 'p1', appointmentId: 'a1', clientId: 'client-1', name: 'Product', price: 30, loyaltyPoints: 3, performedAt: '2024-01-01T10:00:00Z' },
-        { id: 'p2', appointmentId: 'a1', clientId: 'client-2', name: 'Conditioner', price: 15, loyaltyPoints: 1, performedAt: '2024-01-01T10:00:00Z' }
+        { id: 'p1', appointmentId: 'a1', clientId: 'client-1', name: 'Product', price: 30, loyaltyPoints: 3, performedAt: '2024-01-01T10:00:00Z' }
       ]
     });
 

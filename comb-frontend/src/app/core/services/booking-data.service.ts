@@ -39,19 +39,19 @@ export class BookingDataService {
 
   getAppointmentsByClient(clientId: string, size = 100): Observable<AppointmentSummary[]> {
     return this.api
-      .get<PageResponse<AppointmentSummary>>('/appointments', { page: 0, size })
-      .pipe(map(page => page.content.filter(item => item.clientId === clientId)));
+      .get<PageResponse<AppointmentSummary>>('/appointments', { clientId, page: 0, size })
+      .pipe(map(page => page.content));
   }
 
   getServicesByClient(clientId: string, size = 100): Observable<ServiceSummary[]> {
     return this.api
-      .get<PageResponse<ServiceSummary>>('/services', { page: 0, size })
-      .pipe(map(page => page.content.filter(item => item.clientId === clientId)));
+      .get<PageResponse<ServiceSummary>>('/services', { clientId, page: 0, size })
+      .pipe(map(page => page.content));
   }
 
   getPurchasesByClient(clientId: string, size = 100): Observable<PurchaseSummary[]> {
     return this.api
-      .get<PageResponse<PurchaseSummary>>('/purchases', { page: 0, size })
-      .pipe(map(page => page.content.filter(item => item.clientId === clientId)));
+      .get<PageResponse<PurchaseSummary>>('/purchases', { clientId, page: 0, size })
+      .pipe(map(page => page.content));
   }
 }
