@@ -1,16 +1,15 @@
 <div class="dashboard">
   <aside class="sidebar">
     <div class="brand">
-      <img src="assets/comb-icon.svg" alt="Comb as You Are">
+      <img src="assets/comb-icon.svg" alt="Comb as You Are"
+        style="background: #7e7e7e; padding: 6px 10px 5px 6px; border-radius: 45px;">
       <h2>Comb as You Are</h2>
     </div>
     <nav>
       <a class="active">Dashboard</a>
-      <a>Clients</a>
-      <a>Appointments</a>
-      <a>Loyalty</a>
-      <a>Imports</a>
-      <a>Settings</a>
+      <a href="https://github.com/crbatista">GitHub</a>
+      <a href="https://www.cristianbatista.com/">Website</a>
+      <a href="https://www.linkedin.com/in/cristianbh/">LinkedIn</a>
     </nav>
     <button class="logout" (click)="logout()">Log out</button>
   </aside>
@@ -94,14 +93,12 @@
           </form>
         </header>
         <section class="leaderboard" *ngIf="!isLoadingTopClients; else loadingTopClients">
-          <p class="empty-state" *ngIf="enrichedTopClients.length === 0">No loyalty data available for the selected window.</p>
+          <p class="empty-state" *ngIf="enrichedTopClients.length === 0">No loyalty data available for the selected
+            window.</p>
           <ul *ngIf="enrichedTopClients.length > 0">
-            <li *ngFor="let entry of enrichedTopClients; index as i"
-                (click)="openClientModal(entry)"
-                (keydown.enter)="openClientModal(entry)"
-                (keydown.space)="openClientModal(entry)"
-                role="button"
-                tabindex="0">
+            <li *ngFor="let entry of enrichedTopClients; index as i" (click)="openClientModal(entry)"
+              (keydown.enter)="openClientModal(entry)" (keydown.space)="openClientModal(entry)" role="button"
+              tabindex="0">
               <span class="position">#{{ i + 1 }}</span>
               <div class="identifier">
                 <strong>{{ entry.fullName }}</strong>
@@ -123,7 +120,8 @@
           <div class="import-item" *ngFor="let status of importStatusList">
             <div class="import-heading">
               <h3>{{ status.type | titlecase }}</h3>
-              <span class="upload-meta" *ngIf="status.uploadedAt">Last import {{ status.uploadedAt | date:'short' }}</span>
+              <span class="upload-meta" *ngIf="status.uploadedAt">Last import {{ status.uploadedAt | date:'short'
+                }}</span>
             </div>
             <label class="upload-control">
               <input type="file" accept=".csv" (change)="handleImport($event, status.type)">

@@ -116,8 +116,8 @@ services:
 
   comb-frontend:
     build:
-      context: ..
-      dockerfile: comb-frontend/Dockerfile
+      context: ../comb-frontend
+      dockerfile: Dockerfile
     image: phorest/comb-frontend:latest
     depends_on:
       - gateway-service
