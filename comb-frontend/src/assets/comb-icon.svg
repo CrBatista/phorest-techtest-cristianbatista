@@ -1,8 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
-  <rect width="128" height="128" rx="32" fill="#2d7a42"/>
-  <rect x="32" y="28" width="64" height="72" rx="12" fill="white"/>
-  <rect x="40" y="48" width="8" height="36" rx="4" fill="#2d7a42"/>
-  <rect x="56" y="48" width="8" height="36" rx="4" fill="#2d7a42"/>
-  <rect x="72" y="48" width="8" height="36" rx="4" fill="#2d7a42"/>
-  <rect x="88" y="48" width="8" height="36" rx="4" fill="#2d7a42"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="combBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2d7a42"/>
+      <stop offset="100%" stop-color="#195029"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="#f7f2eb"/>
+  <g transform="rotate(-35 64 64)">
+    <path
+      d="M26 42h76c5.523 0 10 4.477 10 10v14c0 5.523-4.477 10-10 10H26c-5.523 0-10-4.477-10-10V52c0-5.523 4.477-10 10-10z"
+      fill="url(#combBodyGradient)"/>
+    <rect x="32" y="48" width="6" height="28" rx="3" fill="#10311b"/>
+    <rect x="46" y="48" width="6" height="28" rx="3" fill="#10311b"/>
+    <rect x="60" y="48" width="6" height="28" rx="3" fill="#10311b"/>
+    <rect x="74" y="48" width="6" height="28" rx="3" fill="#10311b"/>
+    <rect x="88" y="48" width="6" height="28" rx="3" fill="#10311b"/>
+  </g>
 </svg>
