@@ -8,12 +8,10 @@ spring:
       enabled: true
       port: 0
 
-client:
+booking:
   kafka:
     enabled: false
 
-de:
-  flapdoodle:
-    mongodb:
-      embedded:
-        version: 4.4.18
+client:
+  kafka:
+    enabled: false

@@ -4,16 +4,10 @@ spring:
       database: client_service_test
   mongodb:
     embedded:
-      version: 6.0.0
+      version: 5.0.5
       enabled: true
       port: 0
 
 client:
   kafka:
     enabled: false
-
-de:
-  flapdoodle:
-    mongodb:
-      embedded:
-        version: 4.4.18
