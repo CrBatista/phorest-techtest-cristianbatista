@@ -17,20 +17,67 @@
 
   <main class="content">
     <header class="content-header">
-      <div>
-        <h1>Dashboard</h1>
-        <p>Overview of your Phorest event streams</p>
-      </div>
-      <div class="summary-card card">
-        <span>Total Clients</span>
-        <strong>{{ totalClients | number }}</strong>
+      <div class="headline">
+        <h1>Operations Console</h1>
+        <p>Monitor CSV ingests, loyalty trends, and client health from a single view.</p>
       </div>
     </header>
 
-    <section class="widgets-grid">
+    <section class="summary-grid">
+      <article class="card metric-card">
+        <span class="label">Total Clients</span>
+        <strong>{{ totalClients | number }}</strong>
+        <small>Synced across services</small>
+      </article>
+      <article class="card metric-card">
+        <span class="label">Leaderboard Size</span>
+        <strong>{{ topClients.length }}</strong>
+        <small>within selected window</small>
+      </article>
+      <article class="card metric-card">
+        <span class="label">Imports Completed</span>
+        <strong>{{ completedImports }} / {{ importStatusList.length }}</strong>
+        <small>latest session</small>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <article class="card client-directory">
+        <header>
+          <h2>Client Directory</h2>
+          <span class="caption">Newest records</span>
+        </header>
+        <section *ngIf="!isLoadingClients; else loadingClients">
+          <ul class="client-directory__list" *ngIf="clients.length > 0; else emptyClients">
+            <li *ngFor="let client of clients; trackBy: trackClientById">
+              <span class="avatar" [attr.aria-label]="client.gender || 'Unknown gender'">
+                {{ getGenderEmoji(client.gender) }}
+              </span>
+              <div class="details">
+                <strong>{{ client.firstName }} {{ client.lastName }}</strong>
+                <span>{{ client.email }}</span>
+              </div>
+              <div class="meta">
+                <span>{{ client.phone || 'No phone' }}</span>
+                <span class="gender-chip">{{ client.gender || 'N/A' }}</span>
+              </div>
+            </li>
+          </ul>
+        </section>
+        <ng-template #emptyClients>
+          <p class="empty-state">No clients available yet. Try importing a CSV to populate this list.</p>
+        </ng-template>
+        <ng-template #loadingClients>
+          <p class="loading-state">Loading client directory…</p>
+        </ng-template>
+      </article>
+
       <article class="card top-clients">
         <header>
-          <h2>Top Clients</h2>
+          <div>
+            <h2>Loyalty Leaderboard</h2>
+            <span class="caption">High value clients</span>
+          </div>
           <form [formGroup]="filterForm" class="filters">
             <label>
               <span>From</span>
@@ -46,22 +93,28 @@
             </label>
           </form>
         </header>
-        <section class="client-list" *ngIf="!isLoadingTopClients; else loadingTopClients">
-          <p *ngIf="topClients.length === 0">No loyalty data available for the selected window.</p>
+        <section class="leaderboard" *ngIf="!isLoadingTopClients; else loadingTopClients">
+          <p class="empty-state" *ngIf="topClients.length === 0">No loyalty data available for the selected window.</p>
           <ul *ngIf="topClients.length > 0">
-            <li *ngFor="let client of topClients">
-              <span>{{ client.clientId }}</span>
-              <strong>{{ client.loyaltyPoints | number }}</strong>
+            <li *ngFor="let client of topClients; index as i">
+              <span class="position">#{{ i + 1 }}</span>
+              <div class="identifier">
+                <strong>{{ client.clientId }}</strong>
+                <span>{{ client.loyaltyPoints | number }} pts</span>
+              </div>
             </li>
           </ul>
         </section>
         <ng-template #loadingTopClients>
-          <p>Loading loyalty leaderboard...</p>
+          <p class="loading-state">Loading loyalty leaderboard…</p>
         </ng-template>
       </article>
 
       <article class="card import-card">
-        <h2>CSV Imports</h2>
+        <header>
+          <h2>CSV Imports</h2>
+          <span class="caption">Drag &amp; drop soon</span>
+        </header>
         <div class="import-grid">
           <div class="import-item" *ngFor="let status of importStatusList">
             <h3>{{ status.type | titlecase }}</h3>
@@ -74,7 +127,7 @@
               [class.error]="status.status === 'error'">
               <ng-container [ngSwitch]="status.status">
                 <span *ngSwitchCase="'idle'">Waiting for upload</span>
-                <span *ngSwitchCase="'uploading'">Uploading...</span>
+                <span *ngSwitchCase="'uploading'">Uploading…</span>
                 <span *ngSwitchCase="'success'">{{ status.message }}</span>
                 <span *ngSwitchCase="'error'">{{ status.message }}</span>
               </ng-container>

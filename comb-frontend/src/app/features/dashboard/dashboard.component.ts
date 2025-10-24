@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { ClientsService } from '../../core/services/clients.service';
+import { ClientSummary, ClientsService } from '../../core/services/clients.service';
 import { ImportService } from '../../core/services/import.service';
 import { LoyaltyService, TopClient } from '../../core/services/loyalty.service';
 import { Router } from '@angular/router';
@@ -23,9 +23,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   totalClients = 0;
   topClients: TopClient[] = [];
   isLoadingTopClients = false;
+  clients: ClientSummary[] = [];
+  isLoadingClients = false;
 
   readonly filterForm = this.fb.nonNullable.group({
-    from: [this.toIsoDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))],
+    from: [this.toIsoDate(new Date('2010-01-01'))],
     to: [this.toIsoDate(new Date())],
     limit: [5]
   });
@@ -47,10 +49,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private readonly importService: ImportService,
     private readonly loyaltyService: LoyaltyService,
     private readonly router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadSummary();
+    this.loadClients();
     this.loadTopClients();
     this.filterForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.loadTopClients());
   }
@@ -83,6 +86,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         status.status = 'success';
         status.message = 'Import completed successfully.';
         this.loadSummary();
+        this.loadClients();
       },
       error: () => {
         status.status = 'error';
@@ -115,6 +119,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
   }
 
+  private loadClients(): void {
+    this.isLoadingClients = true;
+    this.clientsService
+      .getClients()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: clients => {
+          this.clients = clients;
+          this.isLoadingClients = false;
+        },
+        error: () => {
+          this.clients = [];
+          this.isLoadingClients = false;
+        }
+      });
+  }
+
   private loadTopClients(): void {
     const { from, to, limit } = this.filterForm.getRawValue();
     if (!from || !to) {
@@ -135,6 +156,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.isLoadingTopClients = false;
         }
       });
+  }
+
+  trackClientById(_: number, client: ClientSummary): string {
+    return client.id;
+  }
+
+  getGenderEmoji(gender: string | null | undefined): string {
+    if (!gender) {
+      return '🙂';
+    }
+    const normalized = gender.trim().toLowerCase();
+    if (normalized.startsWith('m')) {
+      return '👨';
+    }
+    if (normalized.startsWith('f')) {
+      return '👩';
+    }
+    return '🙂';
+  }
+
+  get completedImports(): number {
+    return this.importStatusList.filter(status => status.status === 'success').length;
   }
 
   private toIsoDate(date: Date): string {

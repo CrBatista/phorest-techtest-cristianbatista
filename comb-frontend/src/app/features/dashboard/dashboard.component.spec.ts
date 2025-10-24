@@ -18,7 +18,14 @@ describe('DashboardComponent', () => {
       imports: [ReactiveFormsModule],
       providers: [
         { provide: AuthService, useValue: { logout: jasmine.createSpy('logout') } },
-        { provide: ClientsService, useValue: { getTotalClients: () => of(42) } },
+        { provide: ClientsService, useValue: { getTotalClients: () => of(42), getClients: () => of([{
+          id: 'client-1',
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'jane@example.com',
+          phone: '123456789',
+          gender: 'Female'
+        }]) } },
         { provide: ImportService, useValue: { importClients: () => of({}), importAppointments: () => of({}), importServices: () => of({}), importPurchases: () => of({}) } },
         { provide: LoyaltyService, useValue: { getTopClients: () => of([]) } },
         { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }
@@ -32,5 +39,11 @@ describe('DashboardComponent', () => {
 
   it('creates component', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('maps gender to emoji', () => {
+    expect(component.getGenderEmoji('Female')).toBe('👩');
+    expect(component.getGenderEmoji('Male')).toBe('👨');
+    expect(component.getGenderEmoji('')).toBe('🙂');
   });
 });
