@@ -1,6 +1,5 @@
 package com.phorest.loyalty.messaging;
 
-import com.phorest.loyalty.application.config.LoyaltyKafkaProperties;
 import com.phorest.loyalty.domain.serviceitem.ServiceEvent;
 import com.phorest.loyalty.domain.serviceitem.ServiceEventStore;
 import com.phorest.loyalty.domain.serviceitem.ServiceEventType;
@@ -13,20 +12,18 @@ import java.time.Clock;
 import java.util.UUID;
 
 @Component
-@ConditionalOnProperty(name = "client.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "booking.kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class ServiceEventConsumer {
 
     private final ServiceEventStore eventStore;
     private final Clock clock;
-    private final LoyaltyKafkaProperties properties;
 
-    public ServiceEventConsumer(ServiceEventStore eventStore, Clock clock, LoyaltyKafkaProperties properties) {
+    public ServiceEventConsumer(ServiceEventStore eventStore, Clock clock) {
         this.eventStore = eventStore;
         this.clock = clock;
-        this.properties = properties;
     }
 
-    @KafkaListener(topics = "#{@loyaltyKafkaProperties.topic().services()}", groupId = "loyalty-service", containerFactory = "serviceEventKafkaListenerContainerFactory")
+    @KafkaListener(topics = "${booking.kafka.topic.services:booking-services}", groupId = "loyalty-service", containerFactory = "serviceEventKafkaListenerContainerFactory")
     public void handleServiceEvent(ServiceEventMessage message) {
         ServiceProfile profile = new ServiceProfile(
                 message.serviceId(),

@@ -1,6 +1,5 @@
 package com.phorest.loyalty.messaging;
 
-import com.phorest.loyalty.application.config.LoyaltyKafkaProperties;
 import com.phorest.loyalty.domain.serviceitem.ServiceEvent;
 import com.phorest.loyalty.domain.serviceitem.ServiceEventStore;
 import com.phorest.loyalty.domain.serviceitem.ServiceEventType;
@@ -29,8 +28,7 @@ class ServiceEventConsumerTest {
 
     @BeforeEach
     void setUp() {
-        LoyaltyKafkaProperties properties = new LoyaltyKafkaProperties(new LoyaltyKafkaProperties.Topics("services", "purchases"), true);
-        consumer = new ServiceEventConsumer(eventStore, Clock.systemUTC(), properties);
+        consumer = new ServiceEventConsumer(eventStore, Clock.systemUTC());
     }
 
     @Test
