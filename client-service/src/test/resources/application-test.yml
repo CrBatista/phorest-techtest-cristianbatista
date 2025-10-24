@@ -11,3 +11,9 @@ spring:
 client:
   kafka:
     enabled: false
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.4.18

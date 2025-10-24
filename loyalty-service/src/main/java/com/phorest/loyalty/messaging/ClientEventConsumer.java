@@ -16,7 +16,7 @@ public class ClientEventConsumer {
         this.repository = repository;
     }
 
-    @KafkaListener(topics = "${client.kafka.topic}", groupId = "loyalty-service")
+@KafkaListener(topics = "${client.kafka.topic}", groupId = "loyalty-service", containerFactory = "clientEventKafkaListenerContainerFactory")
     public void handleClientEvent(ClientEventMessage message) {
         ClientEventDocument document = new ClientEventDocument();
         document.setEventId(message.eventId());

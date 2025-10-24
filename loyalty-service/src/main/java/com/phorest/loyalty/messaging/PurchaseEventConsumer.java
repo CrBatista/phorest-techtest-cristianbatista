@@ -1,6 +1,5 @@
 package com.phorest.loyalty.messaging;
 
-import com.phorest.loyalty.application.config.LoyaltyKafkaProperties;
 import com.phorest.loyalty.domain.purchase.PurchaseEvent;
 import com.phorest.loyalty.domain.purchase.PurchaseEventStore;
 import com.phorest.loyalty.domain.purchase.PurchaseEventType;
@@ -13,20 +12,18 @@ import java.time.Clock;
 import java.util.UUID;
 
 @Component
-@ConditionalOnProperty(name = "client.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "booking.kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class PurchaseEventConsumer {
 
     private final PurchaseEventStore eventStore;
     private final Clock clock;
-    private final LoyaltyKafkaProperties properties;
 
-    public PurchaseEventConsumer(PurchaseEventStore eventStore, Clock clock, LoyaltyKafkaProperties properties) {
+    public PurchaseEventConsumer(PurchaseEventStore eventStore, Clock clock) {
         this.eventStore = eventStore;
         this.clock = clock;
-        this.properties = properties;
     }
 
-    @KafkaListener(topics = "#{@loyaltyKafkaProperties.topic().purchases()}", groupId = "loyalty-service", containerFactory = "purchaseEventKafkaListenerContainerFactory")
+    @KafkaListener(topics = "${booking.kafka.topic.purchases:booking-purchases}", groupId = "loyalty-service", containerFactory = "purchaseEventKafkaListenerContainerFactory")
     public void handlePurchaseEvent(PurchaseEventMessage message) {
         PurchaseProfile profile = new PurchaseProfile(
                 message.purchaseId(),
