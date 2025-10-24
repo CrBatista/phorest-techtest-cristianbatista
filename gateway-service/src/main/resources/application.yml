@@ -5,57 +5,57 @@ spring:
     gateway:
       routes:
         - id: client-service-clients
-          uri: http://client-service:8081
+          uri: http://client-service:8080
           predicates:
             - Path=/clients/**
           filters:
             - RewritePath=/clients(?<segment>/?.*), /api/v1/clients${segment}
         - id: client-service-import
-          uri: http://client-service:8081
+          uri: http://client-service:8080
           predicates:
             - Path=/import/clients
           filters:
             - SetPath=/api/v1/import/clients
 
         - id: booking-appointments
-          uri: http://booking-service:8082
+          uri: http://booking-service:8080
           predicates:
             - Path=/appointments/**
           filters:
             - RewritePath=/appointments(?<segment>/?.*), /api/v1/appointments${segment}
         - id: booking-services
-          uri: http://booking-service:8082
+          uri: http://booking-service:8080
           predicates:
             - Path=/services/**
           filters:
             - RewritePath=/services(?<segment>/?.*), /api/v1/services${segment}
         - id: booking-purchases
-          uri: http://booking-service:8082
+          uri: http://booking-service:8080
           predicates:
             - Path=/purchases/**
           filters:
             - RewritePath=/purchases(?<segment>/?.*), /api/v1/purchases${segment}
         - id: booking-import-appointments
-          uri: http://booking-service:8082
+          uri: http://booking-service:8080
           predicates:
             - Path=/import/appointments
           filters:
             - SetPath=/api/v1/import/appointments
         - id: booking-import-services
-          uri: http://booking-service:8082
+          uri: http://booking-service:8080
           predicates:
             - Path=/import/services
           filters:
             - SetPath=/api/v1/import/services
         - id: booking-import-purchases
-          uri: http://booking-service:8082
+          uri: http://booking-service:8080
           predicates:
             - Path=/import/purchases
           filters:
             - SetPath=/api/v1/import/purchases
 
         - id: loyalty-service
-          uri: http://loyalty-service:8083
+          uri: http://loyalty-service:8080
           predicates:
             - Path=/loyalty/**
           filters:
