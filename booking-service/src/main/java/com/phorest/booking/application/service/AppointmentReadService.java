@@ -24,7 +24,7 @@ public class AppointmentReadService {
         this.eventStore = eventStore;
     }
 
-    public Page<AppointmentResponse> getAppointments(Pageable pageable) {
+    public Page<AppointmentResponse> getAppointments(Pageable pageable, String clientId) {
         List<AppointmentEvent> events = eventStore.loadAll();
         Map<String, List<AppointmentEvent>> byId = new LinkedHashMap<>();
         for (AppointmentEvent event : events) {
@@ -35,6 +35,7 @@ public class AppointmentReadService {
                 .map(AppointmentAggregate::snapshot)
                 .flatMap(Optional::stream)
                 .filter(snapshot -> !snapshot.deleted())
+                .filter(snapshot -> clientId == null || clientId.isBlank() || snapshot.clientId().equals(clientId))
                 .map(this::toResponse)
                 .toList();
 

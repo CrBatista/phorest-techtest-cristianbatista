@@ -1,0 +1,17 @@
+# Compiled output
+dist/
+tmp/
+out/
+
+# Dependencies
+node_modules/
+.angular/
+
+# IDE files
+.idea/
+.vscode/
+
+# Misc
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

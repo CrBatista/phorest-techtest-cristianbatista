@@ -113,6 +113,18 @@ services:
       - "8080:8080"
     networks:
       - phorest-network
+
+  comb-frontend:
+    build:
+      context: ../comb-frontend
+      dockerfile: Dockerfile
+    image: phorest/comb-frontend:latest
+    depends_on:
+      - gateway-service
+    ports:
+      - "4200:80"
+    networks:
+      - phorest-network
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.3
     container_name: phorest-zookeeper

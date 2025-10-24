@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,8 +31,9 @@ public class ServiceController {
     }
 
     @GetMapping
-    public Page<ServiceResponse> list(Pageable pageable) {
-        return readService.getServices(pageable);
+    public Page<ServiceResponse> list(Pageable pageable,
+                                      @RequestParam(value = "clientId", required = false) String clientId) {
+        return readService.getServices(pageable, clientId);
     }
 
     @GetMapping("/{serviceId}")
