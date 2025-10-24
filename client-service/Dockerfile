@@ -1,10 +1,11 @@
-# Build Stage: rely on pre-built jar copied from local build
-FROM openjdk:21-jdk-slim
+# Build and runtime image for client-service
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+WORKDIR /workspace
+COPY . .
+RUN mvn -pl client-service -am package -DskipTests
 
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-
-COPY client-service/target/client-service-*.jar app.jar
-
+COPY --from=build /workspace/client-service/target/client-service-*.jar app.jar
 EXPOSE 8081
-
 ENTRYPOINT ["java", "-jar", "app.jar"]
