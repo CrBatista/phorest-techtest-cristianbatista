@@ -15,7 +15,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.Map;
 
 @Configuration
-@ConditionalOnProperty(name = "client.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "booking.kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class KafkaConsumerConfig {
 
     @Bean
