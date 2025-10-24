@@ -1,10 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, catchError, forkJoin, map, of, switchMap, takeUntil } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ClientSummary, ClientsService } from '../../core/services/clients.service';
 import { ImportService } from '../../core/services/import.service';
-import { LoyaltyService, TopClient } from '../../core/services/loyalty.service';
+import { LoyaltyService } from '../../core/services/loyalty.service';
+import {
+  AppointmentSummary,
+  BookingDataService,
+  PurchaseSummary,
+  ServiceSummary
+} from '../../core/services/booking-data.service';
 import { Router } from '@angular/router';
 
 interface ImportStatus {
@@ -14,6 +20,19 @@ interface ImportStatus {
   message?: string;
 }
 
+interface LeaderboardEntry {
+  clientId: string;
+  loyaltyPoints: number;
+  fullName: string;
+  client?: ClientSummary | null;
+}
+
+interface ClientModalData {
+  appointments: AppointmentSummary[];
+  services: ServiceSummary[];
+  purchases: PurchaseSummary[];
+}
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -21,13 +40,21 @@ interface ImportStatus {
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   totalClients = 0;
-  topClients: TopClient[] = [];
+  enrichedTopClients: LeaderboardEntry[] = [];
   isLoadingTopClients = false;
   clients: ClientSummary[] = [];
   isLoadingClients = false;
+  isModalOpen = false;
+  isModalLoading = false;
+  selectedClient: ClientSummary | null = null;
+  modalData: ClientModalData = {
+    appointments: [],
+    services: [],
+    purchases: []
+  };
 
   readonly filterForm = this.fb.nonNullable.group({
-    from: [this.toIsoDate(new Date('2010-01-01'))],
+    from: [this.toIsoDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))],
     to: [this.toIsoDate(new Date())],
     limit: [5]
   });
@@ -48,8 +75,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private readonly clientsService: ClientsService,
     private readonly importService: ImportService,
     private readonly loyaltyService: LoyaltyService,
+    private readonly bookingDataService: BookingDataService,
     private readonly router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadSummary();
@@ -145,14 +173,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isLoadingTopClients = true;
     this.loyaltyService
       .getTopClients(Number(limit), from, to)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        switchMap(entries => {
+          if (!entries.length) {
+            return of<LeaderboardEntry[]>([]);
+          }
+          const lookups = entries.map(entry =>
+            this.clientsService.getClientById(entry.clientId).pipe(
+              map(client => ({
+                clientId: entry.clientId,
+                loyaltyPoints: entry.loyaltyPoints,
+                fullName: `${client.firstName} ${client.lastName}`.trim() || client.email,
+                client
+              })),
+              catchError(() =>
+                of<LeaderboardEntry>({
+                  clientId: entry.clientId,
+                  loyaltyPoints: entry.loyaltyPoints,
+                  fullName: entry.clientId,
+                  client: null
+                })
+              )
+            )
+          );
+          return forkJoin(lookups);
+        }),
+        takeUntil(this.destroy$)
+      )
       .subscribe({
-        next: clients => {
-          this.topClients = clients;
+        next: enriched => {
+          this.enrichedTopClients = enriched;
           this.isLoadingTopClients = false;
         },
         error: () => {
-          this.topClients = [];
+          this.enrichedTopClients = [];
           this.isLoadingTopClients = false;
         }
       });
@@ -160,6 +214,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   trackClientById(_: number, client: ClientSummary): string {
     return client.id;
+  }
+
+  openClientModal(entry: LeaderboardEntry): void {
+    this.isModalOpen = true;
+    this.isModalLoading = true;
+    this.modalData = { appointments: [], services: [], purchases: [] };
+
+    const client$ = entry.client ? of(entry.client) : this.clientsService.getClientById(entry.clientId);
+
+    forkJoin({
+      client: client$,
+      appointments: this.bookingDataService.getAppointmentsByClient(entry.clientId),
+      services: this.bookingDataService.getServicesByClient(entry.clientId),
+      purchases: this.bookingDataService.getPurchasesByClient(entry.clientId)
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: ({ client, appointments, services, purchases }) => {
+          this.selectedClient = client ?? null;
+          this.modalData = { appointments, services, purchases };
+          this.isModalLoading = false;
+        },
+        error: () => {
+          this.isModalLoading = false;
+        }
+      });
+  }
+
+  closeClientModal(): void {
+    this.isModalOpen = false;
+    this.selectedClient = null;
+    this.modalData = { appointments: [], services: [], purchases: [] };
   }
 
   getGenderEmoji(gender: string | null | undefined): string {

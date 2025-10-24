@@ -31,7 +31,7 @@
       </article>
       <article class="card metric-card">
         <span class="label">Leaderboard Size</span>
-        <strong>{{ topClients.length }}</strong>
+        <strong>{{ enrichedTopClients.length }}</strong>
         <small>within selected window</small>
       </article>
       <article class="card metric-card">
@@ -94,13 +94,18 @@
           </form>
         </header>
         <section class="leaderboard" *ngIf="!isLoadingTopClients; else loadingTopClients">
-          <p class="empty-state" *ngIf="topClients.length === 0">No loyalty data available for the selected window.</p>
-          <ul *ngIf="topClients.length > 0">
-            <li *ngFor="let client of topClients; index as i">
+          <p class="empty-state" *ngIf="enrichedTopClients.length === 0">No loyalty data available for the selected window.</p>
+          <ul *ngIf="enrichedTopClients.length > 0">
+            <li *ngFor="let entry of enrichedTopClients; index as i"
+                (click)="openClientModal(entry)"
+                (keydown.enter)="openClientModal(entry)"
+                (keydown.space)="openClientModal(entry)"
+                role="button"
+                tabindex="0">
               <span class="position">#{{ i + 1 }}</span>
               <div class="identifier">
-                <strong>{{ client.clientId }}</strong>
-                <span>{{ client.loyaltyPoints | number }} pts</span>
+                <strong>{{ entry.fullName }}</strong>
+                <span>{{ entry.loyaltyPoints | number }} pts</span>
               </div>
             </li>
           </ul>
@@ -113,7 +118,6 @@
       <article class="card import-card">
         <header>
           <h2>CSV Imports</h2>
-          <span class="caption">Drag &amp; drop soon</span>
         </header>
         <div class="import-grid">
           <div class="import-item" *ngFor="let status of importStatusList">
@@ -123,8 +127,7 @@
               <span>Select CSV</span>
             </label>
             <p class="filename" *ngIf="status.fileName">{{ status.fileName }}</p>
-            <p class="status" [class.success]="status.status === 'success'"
-              [class.error]="status.status === 'error'">
+            <p class="status" [class.success]="status.status === 'success'" [class.error]="status.status === 'error'">
               <ng-container [ngSwitch]="status.status">
                 <span *ngSwitchCase="'idle'">Waiting for upload</span>
                 <span *ngSwitchCase="'uploading'">Uploading…</span>
@@ -137,4 +140,61 @@
       </article>
     </section>
   </main>
+
+  <div class="modal-backdrop" *ngIf="isModalOpen">
+    <div class="client-modal" role="dialog" aria-modal="true">
+      <header>
+        <div>
+          <h2>{{ selectedClient?.firstName }} {{ selectedClient?.lastName }}</h2>
+          <p>{{ selectedClient?.email || 'No email available' }}</p>
+        </div>
+        <button type="button" class="close" (click)="closeClientModal()" aria-label="Close modal">×</button>
+      </header>
+
+      <section *ngIf="isModalLoading" class="modal-loading">
+        Loading client activity…
+      </section>
+
+      <section *ngIf="!isModalLoading" class="modal-content">
+        <div class="modal-column">
+          <h3>Appointments</h3>
+          <ul *ngIf="modalData.appointments.length > 0; else noAppointments">
+            <li *ngFor="let appt of modalData.appointments">
+              <strong>{{ appt.startTime | date:'medium' }}</strong>
+              <span>Ends {{ appt.endTime | date:'medium' }}</span>
+            </li>
+          </ul>
+          <ng-template #noAppointments>
+            <p class="empty-state">No appointments recorded.</p>
+          </ng-template>
+        </div>
+
+        <div class="modal-column">
+          <h3>Services</h3>
+          <ul *ngIf="modalData.services.length > 0; else noServices">
+            <li *ngFor="let service of modalData.services">
+              <strong>{{ service.name }}</strong>
+              <span>{{ service.performedAt | date:'mediumDate' }} • {{ service.price | currency }}</span>
+            </li>
+          </ul>
+          <ng-template #noServices>
+            <p class="empty-state">No services recorded.</p>
+          </ng-template>
+        </div>
+
+        <div class="modal-column">
+          <h3>Purchases</h3>
+          <ul *ngIf="modalData.purchases.length > 0; else noPurchases">
+            <li *ngFor="let purchase of modalData.purchases">
+              <strong>{{ purchase.name }}</strong>
+              <span>{{ purchase.performedAt | date:'mediumDate' }} • {{ purchase.price | currency }}</span>
+            </li>
+          </ul>
+          <ng-template #noPurchases>
+            <p class="empty-state">No purchases recorded.</p>
+          </ng-template>
+        </div>
+      </section>
+    </div>
+  </div>
 </div>

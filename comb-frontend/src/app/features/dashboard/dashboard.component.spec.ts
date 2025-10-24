@@ -7,6 +7,7 @@ import { ImportService } from '../../core/services/import.service';
 import { LoyaltyService } from '../../core/services/loyalty.service';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
+import { BookingDataService } from '../../core/services/booking-data.service';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -25,9 +26,17 @@ describe('DashboardComponent', () => {
           email: 'jane@example.com',
           phone: '123456789',
           gender: 'Female'
-        }]) } },
+        }]), getClientById: () => of({
+          id: 'client-1',
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'jane@example.com',
+          phone: '123456789',
+          gender: 'Female'
+        }) } },
         { provide: ImportService, useValue: { importClients: () => of({}), importAppointments: () => of({}), importServices: () => of({}), importPurchases: () => of({}) } },
         { provide: LoyaltyService, useValue: { getTopClients: () => of([]) } },
+        { provide: BookingDataService, useValue: { getAppointmentsByClient: () => of([]), getServicesByClient: () => of([]), getPurchasesByClient: () => of([]) } },
         { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }
       ]
     }).compileComponents();

@@ -19,7 +19,7 @@ interface ClientPage {
 
 @Injectable({ providedIn: 'root' })
 export class ClientsService {
-  constructor(private readonly api: ApiService) {}
+  constructor(private readonly api: ApiService) { }
 
   getTotalClients(): Observable<number> {
     return this.api
@@ -27,7 +27,7 @@ export class ClientsService {
       .pipe(map(response => response.totalElements));
   }
 
-  getClients(limit = 6): Observable<ClientSummary[]> {
+  getClients(limit = 10): Observable<ClientSummary[]> {
     return this.api
       .get<ClientPage>('/clients', { page: 0, size: limit })
       .pipe(map(response => response.content));

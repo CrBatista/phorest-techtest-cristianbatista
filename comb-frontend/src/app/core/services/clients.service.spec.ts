@@ -47,4 +47,15 @@ describe('ClientsService', () => {
     expect(clients.length).toBe(1);
     expect(clients[0].id).toBe('c1');
   });
+
+  it('fetches a client by id', () => {
+    let client: ClientSummary | undefined;
+    service.getClientById('c1').subscribe(value => (client = value));
+
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/clients/c1`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ id: 'c1', firstName: 'Jane', lastName: 'Doe', email: 'jane@example.com', phone: '123', gender: 'Female' });
+
+    expect(client?.id).toBe('c1');
+  });
 });
