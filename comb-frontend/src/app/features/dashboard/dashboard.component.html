@@ -1,0 +1,87 @@
+<div class="dashboard">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/comb-icon.svg" alt="Comb as You Are">
+      <h2>Comb as You Are</h2>
+    </div>
+    <nav>
+      <a class="active">Dashboard</a>
+      <a>Clients</a>
+      <a>Appointments</a>
+      <a>Loyalty</a>
+      <a>Imports</a>
+      <a>Settings</a>
+    </nav>
+    <button class="logout" (click)="logout()">Log out</button>
+  </aside>
+
+  <main class="content">
+    <header class="content-header">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Overview of your Phorest event streams</p>
+      </div>
+      <div class="summary-card card">
+        <span>Total Clients</span>
+        <strong>{{ totalClients | number }}</strong>
+      </div>
+    </header>
+
+    <section class="widgets-grid">
+      <article class="card top-clients">
+        <header>
+          <h2>Top Clients</h2>
+          <form [formGroup]="filterForm" class="filters">
+            <label>
+              <span>From</span>
+              <input type="date" formControlName="from">
+            </label>
+            <label>
+              <span>To</span>
+              <input type="date" formControlName="to">
+            </label>
+            <label>
+              <span>Limit</span>
+              <input type="number" min="1" max="50" formControlName="limit">
+            </label>
+          </form>
+        </header>
+        <section class="client-list" *ngIf="!isLoadingTopClients; else loadingTopClients">
+          <p *ngIf="topClients.length === 0">No loyalty data available for the selected window.</p>
+          <ul *ngIf="topClients.length > 0">
+            <li *ngFor="let client of topClients">
+              <span>{{ client.clientId }}</span>
+              <strong>{{ client.loyaltyPoints | number }}</strong>
+            </li>
+          </ul>
+        </section>
+        <ng-template #loadingTopClients>
+          <p>Loading loyalty leaderboard...</p>
+        </ng-template>
+      </article>
+
+      <article class="card import-card">
+        <h2>CSV Imports</h2>
+        <div class="import-grid">
+          <div class="import-item" *ngFor="let status of importStatusList">
+            <h3>{{ status.type | titlecase }}</h3>
+            <label class="upload">
+              <input type="file" accept=".csv" (change)="handleImport($event, status.type)">
+              <span>Select CSV</span>
+            </label>
+            <p class="filename" *ngIf="status.fileName">{{ status.fileName }}</p>
+            <p class="status" [class.success]="status.status === 'success'"
+              [class.error]="status.status === 'error'">
+              <ng-container [ngSwitch]="status.status">
+                <span *ngSwitchCase="'idle'">Waiting for upload</span>
+                <span *ngSwitchCase="'uploading'">Uploading...</span>
+                <span *ngSwitchCase="'success'">{{ status.message }}</span>
+                <span *ngSwitchCase="'error'">{{ status.message }}</span>
+              </ng-container>
+            </p>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>

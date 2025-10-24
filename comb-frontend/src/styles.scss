@@ -1,0 +1,56 @@
+@use 'sass:color';
+
+:root {
+  --primary: #2d7a42;
+  --primary-dark: color.scale(#2d7a42, $lightness: -15%);
+  --background: #f7f2eb;
+  --text: #2a2a2a;
+  --surface: #ffffff;
+  --surface-muted: #ecf3ee;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+}
+
+body.app-body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text);
+}
+
+.app-surface {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border: none;
+  color: #fff;
+  padding: 0.75rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease-in-out, transform 160ms ease-in-out;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card {
+  border-radius: 16px;
+  background: var(--surface);
+  padding: 1.5rem;
+  box-shadow: 0 14px 28px rgba(31, 60, 50, 0.06);
+}
+
+input[type="file"] {
+  width: 100%;
+}
