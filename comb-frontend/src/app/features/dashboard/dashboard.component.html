@@ -121,12 +121,24 @@
         </header>
         <div class="import-grid">
           <div class="import-item" *ngFor="let status of importStatusList">
-            <h3>{{ status.type | titlecase }}</h3>
-            <label class="upload">
+            <div class="import-heading">
+              <h3>{{ status.type | titlecase }}</h3>
+              <span class="upload-meta" *ngIf="status.uploadedAt">Last import {{ status.uploadedAt | date:'short' }}</span>
+            </div>
+            <label class="upload-control">
               <input type="file" accept=".csv" (change)="handleImport($event, status.type)">
-              <span>Select CSV</span>
+              <div class="upload-content">
+                <span class="upload-title">Drop file or click to browse</span>
+                <span class="upload-subtitle">{{ status.type }}.csv</span>
+              </div>
             </label>
             <p class="filename" *ngIf="status.fileName">{{ status.fileName }}</p>
+            <div class="summary-chips" *ngIf="status.summary">
+              <span><small>Processed</small><strong>{{ status.summary.processed }}</strong></span>
+              <span><small>Created</small><strong>{{ status.summary.created }}</strong></span>
+              <span><small>Updated</small><strong>{{ status.summary.updated }}</strong></span>
+              <span><small>Skipped</small><strong>{{ status.summary.skipped }}</strong></span>
+            </div>
             <p class="status" [class.success]="status.status === 'success'" [class.error]="status.status === 'error'">
               <ng-container [ngSwitch]="status.status">
                 <span *ngSwitchCase="'idle'">Waiting for upload</span>

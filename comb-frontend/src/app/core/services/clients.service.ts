@@ -27,6 +27,10 @@ export class ClientsService {
       .pipe(map(response => response.totalElements));
   }
 
+  getClientById(clientId: string): Observable<ClientSummary> {
+    return this.api.get<ClientSummary>(`/clients/${clientId}`);
+  }
+
   getClients(limit = 10): Observable<ClientSummary[]> {
     return this.api
       .get<ClientPage>('/clients', { page: 0, size: limit })

@@ -34,7 +34,12 @@ describe('DashboardComponent', () => {
           phone: '123456789',
           gender: 'Female'
         }) } },
-        { provide: ImportService, useValue: { importClients: () => of({}), importAppointments: () => of({}), importServices: () => of({}), importPurchases: () => of({}) } },
+        { provide: ImportService, useValue: {
+          importClients: () => of({ processed: 1, created: 1, updated: 0, skipped: 0 }),
+          importAppointments: () => of({ processed: 1, created: 1, updated: 0, skipped: 0 }),
+          importServices: () => of({ processed: 1, created: 1, updated: 0, skipped: 0 }),
+          importPurchases: () => of({ processed: 1, created: 1, updated: 0, skipped: 0 })
+        } },
         { provide: LoyaltyService, useValue: { getTopClients: () => of([]) } },
         { provide: BookingDataService, useValue: { getAppointmentsByClient: () => of([]), getServicesByClient: () => of([]), getPurchasesByClient: () => of([]) } },
         { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }

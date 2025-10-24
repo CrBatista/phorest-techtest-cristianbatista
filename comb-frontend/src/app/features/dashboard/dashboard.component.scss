@@ -282,30 +282,92 @@ nav a.active {
   gap: 0.45rem;
 }
 
-.upload {
-  display: grid;
-  place-items: center;
-  padding: 0.65rem;
-  border-radius: 10px;
-  background: rgba(45, 122, 66, 0.12);
+.import-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-meta {
+  font-size: 0.75rem;
+  color: #7f8f85;
+}
+
+.upload-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(45, 122, 66, 0.35);
+  background: rgba(45, 122, 66, 0.08);
   color: var(--primary);
   font-weight: 600;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  transition: border-color 120ms ease-in-out, background 120ms ease-in-out;
 }
 
-.upload input {
+.upload-control:hover {
+  border-color: rgba(45, 122, 66, 0.6);
+  background: rgba(45, 122, 66, 0.12);
+}
+
+.upload-control input {
   position: absolute;
   inset: 0;
   opacity: 0;
   cursor: pointer;
 }
 
+.upload-content {
+  display: grid;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.upload-title {
+  font-size: 0.85rem;
+}
+
+.upload-subtitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #607068;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .filename,
 .status {
   font-size: 0.78rem;
   color: #57665e;
+}
+
+.summary-chips {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.5rem;
+  justify-content: start;
+  background: rgba(45, 122, 66, 0.08);
+  border-radius: 10px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.75rem;
+  color: #1f3c33;
+}
+
+.summary-chips span {
+  display: grid;
+  gap: 0.1rem;
+  text-align: center;
+}
+
+.summary-chips strong {
+  font-size: 0.85rem;
+  color: var(--primary);
 }
 
 .status.success {
@@ -424,5 +486,10 @@ nav a.active {
 
   .client-modal {
     padding: 1.5rem;
+  }
+
+  .summary-chips {
+    grid-auto-flow: row;
+    justify-items: start;
   }
 }

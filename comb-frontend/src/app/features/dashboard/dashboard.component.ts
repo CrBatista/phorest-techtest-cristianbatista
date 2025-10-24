@@ -3,7 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { Observable, Subject, catchError, forkJoin, map, of, switchMap, takeUntil } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ClientSummary, ClientsService } from '../../core/services/clients.service';
-import { ImportService } from '../../core/services/import.service';
+import { ImportService, ImportSummary } from '../../core/services/import.service';
 import { LoyaltyService } from '../../core/services/loyalty.service';
 import {
   AppointmentSummary,
@@ -18,6 +18,8 @@ interface ImportStatus {
   fileName: string;
   status: 'idle' | 'uploading' | 'success' | 'error';
   message?: string;
+  summary?: ImportSummary;
+  uploadedAt?: Date;
 }
 
 interface LeaderboardEntry {
@@ -54,7 +56,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   };
 
   readonly filterForm = this.fb.nonNullable.group({
-    from: [this.toIsoDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))],
+    from: [this.toIsoDate(new Date('2010-01-01'))],
     to: [this.toIsoDate(new Date())],
     limit: [5]
   });
@@ -77,7 +79,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private readonly loyaltyService: LoyaltyService,
     private readonly bookingDataService: BookingDataService,
     private readonly router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadSummary();
@@ -107,23 +109,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
     status.fileName = file.name;
     status.status = 'uploading';
     status.message = undefined;
+    status.summary = undefined;
+    status.uploadedAt = undefined;
 
     const upload$ = this.getImportObservable(type, file);
     upload$.subscribe({
-      next: () => {
+      next: summary => {
         status.status = 'success';
-        status.message = 'Import completed successfully.';
+        status.summary = summary;
+        status.uploadedAt = new Date();
+        status.message = this.buildImportMessage(summary);
         this.loadSummary();
         this.loadClients();
       },
       error: () => {
         status.status = 'error';
         status.message = 'Import failed. Please try again.';
+        status.summary = undefined;
+        status.uploadedAt = undefined;
       }
     });
   }
 
-  private getImportObservable(type: ImportStatus['type'], file: File): Observable<unknown> {
+  private getImportObservable(type: ImportStatus['type'], file: File): Observable<ImportSummary> {
     switch (type) {
       case 'clients':
         return this.importService.importClients(file);
@@ -135,6 +143,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return this.importService.importPurchases(file);
     }
     throw new Error(`Unsupported import type: ${type}`);
+  }
+
+  private buildImportMessage(summary: ImportSummary): string {
+    return `Processed ${summary.processed}, Created ${summary.created}, Updated ${summary.updated}, Skipped ${summary.skipped}`;
   }
 
   private loadSummary(): void {
