@@ -10,7 +10,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LoginComponent {
   readonly form = this.fb.nonNullable.group({
-    username: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required]],
     password: ['', [Validators.required]]
   });
 
