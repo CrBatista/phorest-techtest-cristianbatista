@@ -8,6 +8,7 @@ volumes:
   loyalty_mongodb_data:
   kafka_data:
   zookeeper_data:
+  zookeeper_log:
 
 services:
   zookeeper:
@@ -21,7 +22,7 @@ services:
       - "42181:2181"
     volumes:
       - zookeeper_data:/var/lib/zookeeper/data
-      - zookeeper_data:/var/lib/zookeeper/log
+      - zookeeper_log:/var/lib/zookeeper/log
     networks:
       - phorest-network
 
