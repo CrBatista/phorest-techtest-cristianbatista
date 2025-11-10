@@ -14,6 +14,9 @@ RUN npm run build -- --configuration=production
 # Stage 2: serve with Nginx
 FROM nginx:1.27-alpine
 
+RUN rm -f /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=build /app/dist/comb-as-you-are /usr/share/nginx/html
 
 EXPOSE 80

@@ -10,6 +10,7 @@ volumes:
   loyalty_mongodb_data:
   kafka_data:
   zookeeper_data:
+  zookeeper_log:
 
 services:
   client-mongodb:
@@ -132,11 +133,13 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_DATA_DIR: /var/lib/zookeeper/data
+      ZOOKEEPER_DATA_LOG_DIR: /var/lib/zookeeper/log
     ports:
       - "2181:2181"
     volumes:
       - zookeeper_data:/var/lib/zookeeper/data
-      - zookeeper_data:/var/lib/zookeeper/log
+      - zookeeper_log:/var/lib/zookeeper/log
     networks:
       - phorest-network
 

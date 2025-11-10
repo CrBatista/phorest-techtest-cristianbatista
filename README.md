@@ -35,9 +35,7 @@ The client-service now exposes REST endpoints backed by the event store:
 Each microservice can be containerised alongside its own MongoDB instance and a shared Kafka broker. To build the jars and boot the full stack:
 
 ```bash
-mvn clean package -DskipTests
-docker compose -f ops/docker-compose.yml build
-docker compose -f ops/docker-compose.yml up -d
+docker compose -f ops/docker-compose.yml up --build -d
 ```
 
 To stop and remove everything (including volumes):
